@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233b82f6'><path d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/><polyline points='14 2 14 8 20 8'/><line x1='16' y1='13' x2='8' y2='13'/><line x1='16' y1='17' x2='8' y2='17'/><polyline points='10 9 9 9 8 9'/></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASDOCU 400 Studio - AS/400 Spool to PDF Graphic Designer</title>
+    <!-- Google Fonts: Inter, Outfit for modern headings, JetBrains Mono for AS400 terminal -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app" class="app-root">
+      <!-- Master Top Navigation Bar -->
+      <header class="app-header">
+        <div class="brand-section">
+          <div class="brand-icon-wrapper">
+            <svg class="brand-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <div class="brand-pulse"></div>
+          </div>
+          <div class="brand-text">
+            <h1 class="brand-title">AS<span>DOCU</span> 400 <span class="badge-pro">STUDIO</span></h1>
+            <p class="brand-subtitle">AS/400 Spool Graphic Designer & Data Pipeline Engine</p>
+          </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs" id="mainNavTabs">
+          <button class="nav-tab active" data-view="designer">
+            <span class="tab-icon">📐</span>
+            <span class="tab-text">Progettazione Report</span>
+            <span class="tab-tag">Access Style</span>
+          </button>
+          <button class="nav-tab" data-view="spool">
+            <span class="tab-icon">📟</span>
+            <span class="tab-text">Mappatura Spool AS400</span>
+            <span class="tab-tag green">Terminal 5250</span>
+          </button>
+          <button class="nav-tab" data-view="as400">
+            <span class="tab-icon">🔌</span>
+            <span class="tab-text">Connessione IBM i AS/400</span>
+            <span class="tab-tag green">OUTQ Live</span>
+          </button>
+          <button class="nav-tab" data-view="script">
+            <span class="tab-icon">⚡</span>
+            <span class="tab-text">Script JavaScript</span>
+            <span class="tab-tag yellow">Pipeline</span>
+          </button>
+          <button class="nav-tab" data-view="integration">
+            <span class="tab-icon">🔗</span>
+            <span class="tab-text">Integrazione & API Esterne</span>
+            <span class="tab-tag purple">RPGLE / CLI</span>
+          </button>
+          <button class="nav-tab" data-view="preview">
+            <span class="tab-icon">📄</span>
+            <span class="tab-text">Anteprima & PDF</span>
+            <span class="tab-tag blue">Live PDF</span>
+          </button>
+        </nav>
+
+        <!-- Right Quick Actions -->
+        <div class="header-actions">
+          <div class="template-selector-group">
+            <label for="templateSelect" class="sr-only">Modello</label>
+            <span class="tpl-icon">📑</span>
+            <select id="templateSelect" class="template-dropdown" title="Seleziona Modello di Partenza">
+              <option value="fattura">Fattura Accompagnatoria AS/400</option>
+              <option value="ddt">Documento di Trasporto (D.D.T.)</option>
+              <option value="blank">Nuovo Progetto Vuoto</option>
+            </select>
+          </div>
+
+          <button id="btnSaveTemplate" class="action-btn secondary" title="Esporta Definizione Modello JSON">
+            <span>💾</span> Salva Modello
+          </button>
+          <button id="btnLoadTemplate" class="action-btn secondary" title="Carica Modello da File JSON">
+            <span>📂</span> Apri
+          </button>
+          <input type="file" id="inputLoadTemplateFile" accept=".json" style="display: none;">
+
+          <button id="btnQuickExportPdf" class="action-btn primary" title="Compila ed Esporta PDF Vettoriale">
+            <span>🚀</span> Genera PDF
+          </button>
+        </div>
+      </header>
+
+      <!-- Main Workspace Views Container -->
+      <main class="app-main">
+        <!-- VIEW 1: DESIGNER VIEW (Access Banded Report Designer) -->
+        <div class="view-panel active" id="viewDesigner">
+          <div class="designer-layout">
+            <!-- Left Toolset Panel -->
+            <aside class="designer-toolbox" id="designerToolbox">
+              <div class="toolbox-header">
+                <span class="toolbox-title">STRUMENTI DESIGN</span>
+                <span class="toolbox-subtitle">Trascina o clicca per inserire</span>
+              </div>
+
+              <div class="toolbox-scroll">
+                <!-- Group 1: Testo & Campi Dati -->
+                <div class="tool-group">
+                  <div class="tool-group-title">Testo e Campi Dati</div>
+                  <div class="tool-items-grid">
+                    <button class="tool-card" data-tool="label" title="Etichetta di testo fisso">
+                      <span class="tool-icon">🔤</span>
+                      <span class="tool-name">Etichetta Testo</span>
+                      <span class="tool-desc">Testo statico / fisso</span>
+                    </button>
+                    <button class="tool-card accent-blue" data-tool="field" title="Campo collegato a coordinata Spool o JSON">
+                      <span class="tool-icon">🏷️</span>
+                      <span class="tool-name">Campo Spool</span>
+                      <span class="tool-desc">Dinamico da riga:col</span>
+                    </button>
+                    <button class="tool-card" data-tool="pagenum" title="Numerazione automatica pagina">
+                      <span class="tool-icon">🔢</span>
+                      <span class="tool-name">N. Pagina</span>
+                      <span class="tool-desc">Pagina X di Y</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Group 2: Tabelle & Dati Ripetuti -->
+                <div class="tool-group">
+                  <div class="tool-group-title">Tabelle e Dati Ripetuti</div>
+                  <div class="tool-items-grid">
+                    <button class="tool-card accent-green" data-tool="table" title="Tabella righe ripetute dal corpo spool">
+                      <span class="tool-icon">📋</span>
+                      <span class="tool-name">Tabella Dettaglio</span>
+                      <span class="tool-desc">Righe articoli spool</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Group 3: Codici a Barre & Grafica -->
+                <div class="tool-group">
+                  <div class="tool-group-title">Codici a Barre e QR Code</div>
+                  <div class="tool-items-grid">
+                    <button class="tool-card accent-amber" data-tool="barcode" title="Codice a Barre Code 128 o EAN 13">
+                      <span class="tool-icon">📊</span>
+                      <span class="tool-name">Barcode 1D</span>
+                      <span class="tool-desc">Code128 / EAN13</span>
+                    </button>
+                    <button class="tool-card accent-purple" data-tool="qrcode" title="QR Code per Fattura Elettronica SDI">
+                      <span class="tool-icon">📱</span>
+                      <span class="tool-name">QR-Code 2D</span>
+                      <span class="tool-desc">SDI / Link verifica</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Group 4: Forme & Cornici -->
+                <div class="tool-group">
+                  <div class="tool-group-title">Forme e Cornici</div>
+                  <div class="tool-items-grid">
+                    <button class="tool-card" data-tool="box" title="Riquadro con sfondo e bordi arrotondati">
+                      <span class="tool-icon">🔲</span>
+                      <span class="tool-name">Box / Cornice</span>
+                      <span class="tool-desc">Riquadri dati</span>
+                    </button>
+                    <button class="tool-card" data-tool="line" title="Linea divisoria orizzontale">
+                      <span class="tool-icon">➖</span>
+                      <span class="tool-name">Linea Divisoria</span>
+                      <span class="tool-desc">Separatore grafico</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Group 5: Sezioni Report (Access Bands Toggle) -->
+                <div class="tool-group">
+                  <div class="tool-group-title">Sezioni Documento</div>
+                  <div class="sections-toggle-list">
+                    <label class="section-check-item">
+                      <input type="checkbox" id="chk_sec_reportHeader" checked>
+                      <span class="chk-color-indicator" style="background: #6366f1;"></span>
+                      <span>Intestazione Report</span>
+                    </label>
+                    <label class="section-check-item">
+                      <input type="checkbox" id="chk_sec_pageHeader" checked>
+                      <span class="chk-color-indicator" style="background: #3b82f6;"></span>
+                      <span>Intestazione Pagina</span>
+                    </label>
+                    <label class="section-check-item">
+                      <input type="checkbox" id="chk_sec_detail" checked>
+                      <span class="chk-color-indicator" style="background: #10b981;"></span>
+                      <span>Corpo / Dettaglio</span>
+                    </label>
+                    <label class="section-check-item">
+                      <input type="checkbox" id="chk_sec_pageFooter" checked>
+                      <span class="chk-color-indicator" style="background: #f59e0b;"></span>
+                      <span>Piede di Pagina</span>
+                    </label>
+                    <label class="section-check-item">
+                      <input type="checkbox" id="chk_sec_reportFooter" checked>
+                      <span class="chk-color-indicator" style="background: #ec4899;"></span>
+                      <span>Piede del Report</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </aside>
+
+            <!-- Center Design Canvas Area -->
+            <div class="designer-canvas-host" id="designerCanvasHost">
+              <!-- Rendered dynamically by DesignerCanvas -->
+            </div>
+
+            <!-- Right Property Inspector Panel -->
+            <aside class="designer-inspector" id="designerInspector">
+              <!-- Rendered dynamically by PropertyInspector -->
+            </aside>
+          </div>
+        </div>
+
+        <!-- VIEW 2: SPOOL TERMINAL MAPPER (Validoc Green Screen 5250) -->
+        <div class="view-panel" id="viewSpool">
+          <div id="spoolMapperHost" class="full-view-host">
+            <!-- Rendered dynamically by SpoolMapperUI -->
+          </div>
+        </div>
+
+        <!-- VIEW 3: IBM i AS/400 CONNECTION & OUTQ BROWSER -->
+        <div class="view-panel" id="viewAs400">
+          <div id="as400ConnectorHost" class="full-view-host">
+            <!-- Rendered dynamically by As400ConnectorUI -->
+          </div>
+        </div>
+
+        <!-- VIEW 4: JAVASCRIPT PIPELINE & SCRIPTING STUDIO -->
+        <div class="view-panel" id="viewScript">
+          <div id="scriptStudioHost" class="full-view-host">
+            <!-- Rendered dynamically by ScriptEditorUI -->
+          </div>
+        </div>
+
+        <!-- VIEW 5: EXTERNAL PROGRAM INTEGRATION & API HUB -->
+        <div class="view-panel" id="viewIntegration">
+          <div id="integrationHost" class="full-view-host">
+            <!-- Rendered dynamically by IntegrationApiUI -->
+          </div>
+        </div>
+
+        <!-- VIEW 6: LIVE PDF PREVIEW AND EXPORT STATION -->
+        <div class="view-panel" id="viewPreview">
+          <div id="pdfPreviewHost" class="full-view-host">
+            <!-- Rendered dynamically by PdfPreviewUI -->
+          </div>
+        </div>
+      </main>
+
+      <!-- Status Footer Bar -->
+      <footer class="app-statusbar">
+        <div class="status-left">
+          <span class="status-indicator online"></span>
+          <span class="status-text" id="statusMessage">Pronto - ASDOCU 400 Studio attivo</span>
+          <span class="status-separator">|</span>
+          <span class="status-coords" id="statusCoords">A4 (210 x 297 mm) • Snap Griglia: 2 mm</span>
+        </div>
+        <div class="status-right">
+          <span class="status-engine">Engine: jsPDF + IBM i Spool Parser + JsBarcode</span>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Main JavaScript Application Bootstrap -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
